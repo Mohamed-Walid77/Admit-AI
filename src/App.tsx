@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import Home from './components/Home';
+// FIX: Changed to a named import to resolve module loading issue.
+import { Home } from './components/Home';
+// FIX: Corrected typo in component import path.
 import ProgramDetail from './components/ProgramDetail';
 import AIAssistant from './components/AIAssistant';
 import Dashboard from './components/Dashboard';

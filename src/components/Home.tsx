@@ -96,7 +96,8 @@ const getDurationCategory = (durationString?: string): 'Short-term' | 'Long-term
 };
 
 
-const Home: React.FC<HomeProps> = ({ setSelectedProgram, trackedApplications, addApplication }) => {
+// FIX: Changed to a named export to resolve module loading issue.
+export const Home: React.FC<HomeProps> = ({ setSelectedProgram, trackedApplications, addApplication }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
     category: 'All Categories',
@@ -175,4 +176,46 @@ const Home: React.FC<HomeProps> = ({ setSelectedProgram, trackedApplications, ad
               <select name="mode" value={filters.mode} onChange={handleFilterChange} className="bg-gray-800/50 border border-gray-600 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-teal-500">
                 {uniqueModes.map(m => <option key={m} value={m}>{m}</option>)}
               </select>
-              <select name="cost" value={filters.cost} onChange={handleFilterChange} className="bg-gray-8
+              <select name="cost" value={filters.cost} onChange={handleFilterChange} className="bg-gray-800/50 border border-gray-600 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <option>All Costs</option>
+                <option>Free</option>
+                <option>Low</option>
+                <option>Medium</option>
+                <option>High</option>
+              </select>
+              <select name="location" value={filters.location} onChange={handleFilterChange} className="bg-gray-800/50 border border-gray-600 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <option>All Locations</option>
+                <option>USA</option>
+                <option>International</option>
+                <option>Online</option>
+              </select>
+              <select name="duration" value={filters.duration} onChange={handleFilterChange} className="bg-gray-800/50 border border-gray-600 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <option>All Durations</option>
+                <option value="Short-term">Short-term (&lt;8 wks)</option>
+                <option value="Long-term">Long-term (≥8 wks)</option>
+              </select>
+            </div>
+          </div>
+          
+          {filteredPrograms.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {filteredPrograms.map(program => (
+                <ProgramCard 
+                  key={program.id} 
+                  program={program} 
+                  onViewDetails={() => setSelectedProgram(program)} 
+                  onAddToTracker={() => addApplication(program)}
+                  isTracked={trackedProgramIds.has(program.id)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16">
+              <p className="text-gray-400 text-lg">No programs found matching your criteria.</p>
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+};
