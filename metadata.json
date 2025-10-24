@@ -1,0 +1,7 @@
+{
+  "name": "AdmitAI",
+  "description": "AdmitAI is an intelligent web platform that helps high school students apply for elite summer programs. It provides detailed program information, an AI-powered application assistant with voice capabilities, and a personalized dashboard to track application progress.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
