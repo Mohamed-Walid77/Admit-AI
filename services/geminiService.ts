@@ -1,13 +1,12 @@
 
-
 import { GoogleGenAI, Chat, Modality, Type } from "@google/genai";
 import { Program, SimulationFeedback, ChatMessage } from '../types';
 
-// FIX: Use process.env.API_KEY as per guidelines. This is assumed to be configured in the execution environment.
+// Fix: Switched from import.meta.env.VITE_API_KEY to process.env.API_KEY to align with guidelines and fix the error.
 const API_KEY = process.env.API_KEY;
 
 if (!API_KEY) {
-  // FIX: Updated error message for consistency.
+  // Fix: Updated error message to match the environment variable change.
   throw new Error("API_KEY environment variable not set");
 }
 
