@@ -2,8 +2,8 @@
 import { GoogleGenAI, Chat, Modality, Type } from "@google/genai";
 import { Program, SimulationFeedback, ChatMessage } from '../types';
 
-// Fix: Corrected API key retrieval to use process.env.API_KEY directly, as per coding guidelines.
-// The execution environment is assumed to have this variable pre-configured and accessible.
+// The API key is provided by the execution environment as process.env.API_KEY.
+// No .env file or Vite-specific variable is needed.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const runChat = async (programName: string, history: ChatMessage[], newPrompt: string): Promise<string> => {
