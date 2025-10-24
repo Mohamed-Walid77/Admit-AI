@@ -71,7 +71,7 @@ const App: React.FC = () => {
 
   
   useEffect(() => {
-    if (currentView === 'programDetail' && !selectedProgram) {
+    if ((currentView === 'programDetail' || currentView === 'aiAssistant') && !selectedProgram) {
       setCurrentView('home');
     }
   }, [currentView, selectedProgram]);
@@ -136,10 +136,12 @@ const App: React.FC = () => {
             onToggleFavorite={() => toggleFavorite(selectedProgram.id)}
           />;
         }
-        // Fallback is handled by useEffect. Render nothing or a loader while "redirecting".
         return null;
       case 'aiAssistant':
-        return <AIAssistant />;
+        if (selectedProgram) {
+          return <AIAssistant initialProgram={selectedProgram} />;
+        }
+        return null;
       case 'dashboard':
         return <Dashboard applications={applications} setApplications={setApplications} />;
       case 'simulation':

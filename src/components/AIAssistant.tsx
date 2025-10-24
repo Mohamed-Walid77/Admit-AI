@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Program, ChatMessage } from '../types';
 import { programs } from '../data/programs';
@@ -7,8 +6,12 @@ import { useTextToSpeech } from '../hooks/useTextToSpeech';
 import { SendIcon, SoundOnIcon, SoundOffIcon, SpinnerIcon } from './icons/Icons';
 import { Chat } from '@google/genai';
 
-const AIAssistant: React.FC = () => {
-  const [selectedProgram, setSelectedProgram] = useState<Program | null>(programs[0]);
+interface AIAssistantProps {
+    initialProgram: Program;
+}
+
+const AIAssistant: React.FC<AIAssistantProps> = ({ initialProgram }) => {
+  const [selectedProgram, setSelectedProgram] = useState<Program | null>(initialProgram);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [userInput, setUserInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -17,6 +20,14 @@ const AIAssistant: React.FC = () => {
   
   const { speak, cancel, isSpeaking } = useTextToSpeech();
   const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // This effect ensures the component's state updates if the initial prop changes,
+    // although in the current app flow it will just be used for the initial mount.
+    if (initialProgram) {
+        setSelectedProgram(initialProgram);
+    }
+  }, [initialProgram]);
 
   useEffect(() => {
     if (selectedProgram) {
@@ -77,7 +88,7 @@ const AIAssistant: React.FC = () => {
           </div>
           <div className="flex items-center gap-4">
             <select
-              value={selectedProgram?.id}
+              value={selectedProgram?.id || ''}
               onChange={(e) => setSelectedProgram(programs.find(p => p.id === e.target.value) || null)}
               className="bg-gray-800/80 border border-teal-500/30 text-white text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block p-2.5"
             >
