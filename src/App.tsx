@@ -45,24 +45,6 @@ const App: React.FC = () => {
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
   const [user, setUser] = useState<{name: string} | null>(null);
   const [applications, setApplications] = useState<ApplicationProgress[]>(initialProgress);
-  const [favorites, setFavorites] = useState<Set<string>>(() => {
-    try {
-        const storedFavorites = window.localStorage.getItem('admitai_favorites');
-        return storedFavorites ? new Set(JSON.parse(storedFavorites)) : new Set();
-    } catch (error) {
-        console.error("Failed to parse favorites from localStorage", error);
-        return new Set();
-    }
-  });
-
-  // Effect to sync favorites to localStorage
-  useEffect(() => {
-    try {
-        window.localStorage.setItem('admitai_favorites', JSON.stringify(Array.from(favorites)));
-    } catch (error) {
-        console.error("Failed to save favorites to localStorage", error);
-    }
-  }, [favorites]);
 
   // Simulate user login
   useEffect(() => {
@@ -75,18 +57,6 @@ const App: React.FC = () => {
       setCurrentView('home');
     }
   }, [currentView, selectedProgram]);
-
-  const toggleFavorite = (programId: string) => {
-    setFavorites(prevFavorites => {
-      const newFavorites = new Set(prevFavorites);
-      if (newFavorites.has(programId)) {
-        newFavorites.delete(programId);
-      } else {
-        newFavorites.add(programId);
-      }
-      return newFavorites;
-    });
-  };
 
   const handleSetView = (view: View) => {
     window.scrollTo(0, 0);
@@ -121,8 +91,6 @@ const App: React.FC = () => {
           setSelectedProgram={handleSelectProgram} 
           trackedApplications={applications}
           addApplication={addApplicationToTracker}
-          favorites={favorites}
-          toggleFavorite={toggleFavorite}
         />;
       case 'programDetail':
         if (selectedProgram) {
@@ -132,8 +100,6 @@ const App: React.FC = () => {
             onGoToAssistant={() => handleSetView('aiAssistant')}
             onAddToTracker={() => addApplicationToTracker(selectedProgram)}
             isTracked={applications.some(app => app.programId === selectedProgram.id)}
-            isFavorite={favorites.has(selectedProgram.id)}
-            onToggleFavorite={() => toggleFavorite(selectedProgram.id)}
           />;
         }
         return null;
@@ -151,8 +117,6 @@ const App: React.FC = () => {
           setSelectedProgram={handleSelectProgram}
           trackedApplications={applications}
           addApplication={addApplicationToTracker}
-          favorites={favorites}
-          toggleFavorite={toggleFavorite}
         />;
     }
   };

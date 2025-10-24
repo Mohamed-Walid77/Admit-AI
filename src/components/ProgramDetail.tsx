@@ -1,6 +1,5 @@
 import React from 'react';
 import { Program } from '../types';
-import { HeartIcon, HeartOutlineIcon } from './icons/Icons';
 
 interface ProgramDetailProps {
   program: Program;
@@ -8,11 +7,9 @@ interface ProgramDetailProps {
   onGoToAssistant: () => void;
   onAddToTracker: () => void;
   isTracked: boolean;
-  isFavorite: boolean;
-  onToggleFavorite: () => void;
 }
 
-const ProgramDetail: React.FC<ProgramDetailProps> = ({ program, onBack, onGoToAssistant, onAddToTracker, isTracked, isFavorite, onToggleFavorite }) => {
+const ProgramDetail: React.FC<ProgramDetailProps> = ({ program, onBack, onGoToAssistant, onAddToTracker, isTracked }) => {
   
   const handlePrimaryAction = () => {
     if (isTracked) {
@@ -31,17 +28,10 @@ const ProgramDetail: React.FC<ProgramDetailProps> = ({ program, onBack, onGoToAs
           <div className="p-8">
             <div className="flex flex-col sm:flex-row items-start mb-6">
               <img src={program.logo} alt={`${program.title} logo`} className="w-24 h-24 rounded-full mr-6 mb-4 sm:mb-0 flex-shrink-0 object-cover" />
-              <div className="flex-grow">
-                 <div className="flex justify-between items-start">
-                    <div>
-                      <span className="bg-teal-900/70 text-teal-300 text-xs font-semibold px-3 py-1 rounded-full mb-2 inline-block">{program.category}</span>
-                      <h1 className="text-3xl font-bold text-white">{program.title}</h1>
-                      <p className="text-xl text-teal-300">{program.organization}</p>
-                    </div>
-                    <button onClick={onToggleFavorite} className="p-2 -mt-2 -mr-2 text-gray-400 hover:text-red-500 transition-colors" aria-label="Toggle Favorite">
-                      {isFavorite ? <HeartIcon className="text-red-500" /> : <HeartOutlineIcon />}
-                    </button>
-                  </div>
+              <div>
+                <span className="bg-teal-900/70 text-teal-300 text-xs font-semibold px-3 py-1 rounded-full mb-2 inline-block">{program.category}</span>
+                <h1 className="text-3xl font-bold text-white">{program.title}</h1>
+                <p className="text-xl text-teal-300">{program.organization}</p>
                 {program.tagline && <p className="text-gray-400 mt-2 italic">"{program.tagline}"</p>}
               </div>
             </div>

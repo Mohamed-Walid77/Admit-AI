@@ -1,14 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { Program, ApplicationProgress } from '../types';
 import { programs } from '../data/programs';
-import { HeartIcon, HeartOutlineIcon } from './icons/Icons';
 
 interface HomeProps {
   setSelectedProgram: (program: Program) => void;
   trackedApplications: ApplicationProgress[];
   addApplication: (program: Program) => void;
-  favorites: Set<string>;
-  toggleFavorite: (programId: string) => void;
 }
 
 const ProgramCard: React.FC<{ 
@@ -16,17 +13,8 @@ const ProgramCard: React.FC<{
   onViewDetails: () => void;
   onAddToTracker: () => void;
   isTracked: boolean;
-  isFavorite: boolean;
-  onToggleFavorite: () => void;
-}> = ({ program, onViewDetails, onAddToTracker, isTracked, isFavorite, onToggleFavorite }) => (
-  <div className="bg-gray-900/50 backdrop-blur-lg border border-teal-500/10 rounded-2xl p-6 flex flex-col transition-all duration-300 group hover:border-teal-500/30 hover:-translate-y-2 hover:shadow-2xl hover:shadow-teal-500/10 relative">
-    <button
-      onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
-      className="absolute top-4 right-4 p-2 text-gray-500 hover:text-red-500 transition-colors z-10"
-      aria-label="Toggle Favorite"
-    >
-      {isFavorite ? <HeartIcon className="text-red-500 w-5 h-5" /> : <HeartOutlineIcon className="w-5 h-5" />}
-    </button>
+}> = ({ program, onViewDetails, onAddToTracker, isTracked }) => (
+  <div className="bg-gray-900/50 backdrop-blur-lg border border-teal-500/10 rounded-2xl p-6 flex flex-col transition-all duration-300 group hover:border-teal-500/30 hover:-translate-y-2 hover:shadow-2xl hover:shadow-teal-500/10">
     <div onClick={onViewDetails} className="cursor-pointer flex-grow">
       <div className="flex justify-between items-start mb-4">
         <img src={program.logo} alt={`${program.title} logo`} className="w-16 h-16 rounded-full object-cover" />
@@ -108,9 +96,8 @@ const getDurationCategory = (durationString?: string): 'Short-term' | 'Long-term
 };
 
 
-const Home: React.FC<HomeProps> = ({ setSelectedProgram, trackedApplications, addApplication, favorites, toggleFavorite }) => {
+const Home: React.FC<HomeProps> = ({ setSelectedProgram, trackedApplications, addApplication }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [filters, setFilters] = useState({
     category: 'All Categories',
     mode: 'All Modes',
@@ -137,25 +124,19 @@ const Home: React.FC<HomeProps> = ({ setSelectedProgram, trackedApplications, ad
     setFilters(prev => ({ ...prev, [name]: value }));
   };
 
-  const filteredPrograms = useMemo(() => {
-    if (showFavoritesOnly) {
-      return programs.filter(p => favorites.has(p.id));
-    }
-    
-    return programs.filter(p => {
-      const searchMatch = (
-        p.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        p.organization.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      const categoryMatch = filters.category === 'All Categories' || p.category === filters.category;
-      const modeMatch = filters.mode === 'All Modes' || p.mode === filters.mode;
-      const costMatch = filters.cost === 'All Costs' || getCostCategory(p.cost) === filters.cost;
-      const locationMatch = filters.location === 'All Locations' || getLocationCategory(p) === filters.location;
-      const durationMatch = filters.duration === 'All Durations' || getDurationCategory(p.duration) === filters.duration;
+  const filteredPrograms = useMemo(() => programs.filter(p => {
+    const searchMatch = (
+      p.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      p.organization.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    const categoryMatch = filters.category === 'All Categories' || p.category === filters.category;
+    const modeMatch = filters.mode === 'All Modes' || p.mode === filters.mode;
+    const costMatch = filters.cost === 'All Costs' || getCostCategory(p.cost) === filters.cost;
+    const locationMatch = filters.location === 'All Locations' || getLocationCategory(p) === filters.location;
+    const durationMatch = filters.duration === 'All Durations' || getDurationCategory(p.duration) === filters.duration;
 
-      return searchMatch && categoryMatch && modeMatch && costMatch && locationMatch && durationMatch;
-    });
-  }, [searchTerm, filters, showFavoritesOnly, favorites]);
+    return searchMatch && categoryMatch && modeMatch && costMatch && locationMatch && durationMatch;
+  }), [searchTerm, filters]);
 
   const trackedProgramIds = useMemo(() => new Set(trackedApplications.map(app => app.programId)), [trackedApplications]);
 
@@ -213,16 +194,6 @@ const Home: React.FC<HomeProps> = ({ setSelectedProgram, trackedApplications, ad
                 <option value="Long-term">Long-term (≥8 wks)</option>
               </select>
             </div>
-            <div className="flex items-center justify-center pt-4 border-t border-gray-700/50">
-              <label htmlFor="favorites-toggle" className="flex items-center cursor-pointer">
-                <span className="mr-3 text-sm font-medium text-gray-300">Show Favorites Only</span>
-                <div className="relative">
-                  <input type="checkbox" id="favorites-toggle" className="sr-only" checked={showFavoritesOnly} onChange={() => setShowFavoritesOnly(!showFavoritesOnly)} />
-                  <div className="block bg-gray-600 w-14 h-8 rounded-full"></div>
-                  <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition ${showFavoritesOnly ? 'transform translate-x-6 bg-teal-400' : ''}`}></div>
-                </div>
-              </label>
-            </div>
           </div>
           
           {filteredPrograms.length > 0 ? (
@@ -234,14 +205,12 @@ const Home: React.FC<HomeProps> = ({ setSelectedProgram, trackedApplications, ad
                   onViewDetails={() => setSelectedProgram(program)} 
                   onAddToTracker={() => addApplication(program)}
                   isTracked={trackedProgramIds.has(program.id)}
-                  isFavorite={favorites.has(program.id)}
-                  onToggleFavorite={() => toggleFavorite(program.id)}
                 />
               ))}
             </div>
           ) : (
             <div className="text-center py-16">
-              <p className="text-gray-400 text-lg">{showFavoritesOnly ? "You haven't favorited any programs yet." : "No programs found matching your criteria."}</p>
+              <p className="text-gray-400 text-lg">No programs found matching your criteria.</p>
             </div>
           )}
         </div>

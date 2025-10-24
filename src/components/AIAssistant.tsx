@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Program, ChatMessage } from '../types';
 import { programs } from '../data/programs';
-import { createChatSession, continueChat } from '../services/geminiService';
+import { runChat } from '../services/geminiService';
 import { useTextToSpeech } from '../hooks/useTextToSpeech';
 import { SendIcon, SoundOnIcon, SoundOffIcon, SpinnerIcon } from './icons/Icons';
-import { Chat } from '@google/genai';
 
 interface AIAssistantProps {
     initialProgram: Program;
@@ -16,14 +15,11 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ initialProgram }) => {
   const [userInput, setUserInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isVoiceMode, setIsVoiceMode] = useState(false);
-  const [chatSession, setChatSession] = useState<Chat | null>(null);
   
   const { speak, cancel, isSpeaking } = useTextToSpeech();
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // This effect ensures the component's state updates if the initial prop changes,
-    // although in the current app flow it will just be used for the initial mount.
     if (initialProgram) {
         setSelectedProgram(initialProgram);
     }
@@ -31,10 +27,6 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ initialProgram }) => {
 
   useEffect(() => {
     if (selectedProgram) {
-      // Create a new stateful chat session whenever the selected program changes.
-      const session = createChatSession(selectedProgram.title);
-      setChatSession(session);
-
       const initialMessage: ChatMessage = {
         role: 'model',
         text: `Hello! I'm your AdmitAI assistant. I'm here to help you with your application to the **${selectedProgram.title}**. How can I assist you today? You can ask me to explain application steps, help draft essays, or generate a checklist.`
@@ -52,9 +44,10 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ initialProgram }) => {
   }, [messages, isVoiceMode, isLoading, speak]);
 
   const handleSendMessage = async () => {
-    if (!userInput.trim() || isLoading || !selectedProgram || !chatSession) return;
+    if (!userInput.trim() || isLoading || !selectedProgram) return;
 
     const newUserMessage: ChatMessage = { role: 'user', text: userInput };
+    const historyForAPI = [...messages];
     
     setMessages(prev => [...prev, newUserMessage]);
     const currentInput = userInput;
@@ -63,8 +56,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ initialProgram }) => {
     
     if(isSpeaking) cancel();
 
-    // Use the stateful chat session to continue the conversation
-    const modelResponseText = await continueChat(chatSession, currentInput);
+    const modelResponseText = await runChat(selectedProgram.title, historyForAPI, currentInput);
     const newModelMessage: ChatMessage = { role: 'model', text: modelResponseText };
     
     setMessages(prev => [...prev, newModelMessage]);
