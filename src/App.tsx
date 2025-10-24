@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import { Home } from './components/Home';
-import ProgramDetail from './components/ProgramDetail';
+import Home from './components/Home';
+import ProgramDetail from './components/ProgramDetails';
 import AIAssistant from './components/AIAssistant';
 import Dashboard from './components/Dashboard';
 import Simulation from './components/Simulation';

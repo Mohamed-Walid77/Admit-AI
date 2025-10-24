@@ -96,7 +96,7 @@ const getDurationCategory = (durationString?: string): 'Short-term' | 'Long-term
 };
 
 
-export const Home: React.FC<HomeProps> = ({ setSelectedProgram, trackedApplications, addApplication }) => {
+const Home: React.FC<HomeProps> = ({ setSelectedProgram, trackedApplications, addApplication }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
     category: 'All Categories',
@@ -218,3 +218,5 @@ export const Home: React.FC<HomeProps> = ({ setSelectedProgram, trackedApplicati
     </div>
   );
 };
+
+export default Home;
