@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
-// FIX: Changed to a named import to resolve module loading issue.
 import { Home } from './components/Home';
-// FIX: Corrected typo in component import path.
 import ProgramDetail from './components/ProgramDetail';
 import AIAssistant from './components/AIAssistant';
 import Dashboard from './components/Dashboard';
@@ -53,8 +51,7 @@ const App: React.FC = () => {
     setUser({ name: 'Mohamed' });
   }, []);
 
-  // FIX: Handle invalid state without causing a render loop or state update during render.
-  // This prevents updating state during render, which can cause unexpected errors.
+  
   useEffect(() => {
     if (currentView === 'programDetail' && !selectedProgram) {
       setCurrentView('home');

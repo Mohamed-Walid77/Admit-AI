@@ -96,7 +96,6 @@ const getDurationCategory = (durationString?: string): 'Short-term' | 'Long-term
 };
 
 
-// FIX: Changed to a named export to resolve module loading issue.
 export const Home: React.FC<HomeProps> = ({ setSelectedProgram, trackedApplications, addApplication }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
