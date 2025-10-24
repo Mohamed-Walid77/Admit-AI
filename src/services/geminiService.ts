@@ -3,8 +3,8 @@ import { GoogleGenAI, Chat, Modality, Type } from "@google/genai";
 import { Program, SimulationFeedback, ChatMessage } from '../types';
 
 // The API key is provided by the execution environment as process.env.API_KEY.
-// No .env file or Vite-specific variable is needed.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// We will initialize the client just-in-time within each function to ensure the API key is available.
+const getAiClient = () => new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const runChat = async (programName: string, history: ChatMessage[], newPrompt: string): Promise<string> => {
   const systemInstruction = `You are AdmitAI Global, a world-class AI mentor for high school students aiming for elite global programs. You have comprehensive knowledge of top programs like Pioneer Research, YYGS, RSI, LaunchX, TKS, Regeneron ISEF, The Gates Scholarship, and many more, across all fields from STEM to Humanities.
@@ -22,6 +22,7 @@ Your goal is to be the ultimate application co-pilot, turning a stressful proces
   }));
 
   try {
+     const ai = getAiClient();
      const chat = ai.chats.create({
       model: 'gemini-2.5-flash',
       history: geminiHistory,
@@ -40,6 +41,7 @@ Your goal is to be the ultimate application co-pilot, turning a stressful proces
 
 export const generateSpeech = async (text: string): Promise<string | null> => {
     try {
+        const ai = getAiClient();
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash-preview-tts",
             contents: [{ parts: [{ text: `Say in a friendly, clear, and encouraging voice for a high school student: ${text}` }] }],
@@ -69,6 +71,7 @@ export const getSimulationFeedback = async (program: Program, applicationData: R
   const userPrompt = `Please review my application for the ${program.title}. Here are my responses:\n\n${JSON.stringify(applicationData, null, 2)}`;
   
   try {
+     const ai = getAiClient();
      const response = await ai.models.generateContent({
        model: "gemini-2.5-flash",
        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
