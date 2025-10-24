@@ -2,15 +2,9 @@
 import { GoogleGenAI, Chat, Modality, Type } from "@google/genai";
 import { Program, SimulationFeedback, ChatMessage } from '../types';
 
-// Fix: Switched from import.meta.env.VITE_API_KEY to process.env.API_KEY to align with guidelines and fix the error.
-const API_KEY = process.env.API_KEY;
-
-if (!API_KEY) {
-  // Fix: Updated error message to match the environment variable change.
-  throw new Error("API_KEY environment variable not set");
-}
-
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+// Fix: Corrected API key retrieval to use process.env.API_KEY directly, as per coding guidelines.
+// The execution environment is assumed to have this variable pre-configured and accessible.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const runChat = async (programName: string, history: ChatMessage[], newPrompt: string): Promise<string> => {
   const systemInstruction = `You are AdmitAI Global, a world-class AI mentor for high school students aiming for elite global programs. You have comprehensive knowledge of top programs like Pioneer Research, YYGS, RSI, LaunchX, TKS, Regeneron ISEF, The Gates Scholarship, and many more, across all fields from STEM to Humanities.
