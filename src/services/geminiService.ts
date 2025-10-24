@@ -1,13 +1,15 @@
 
 
+
 import { GoogleGenAI, Chat, Modality, Type } from "@google/genai";
 import { Program, SimulationFeedback, ChatMessage } from '../types';
 
-// FIX: Use process.env.API_KEY as per guidelines. This is assumed to be configured in the execution environment.
+// FIX: Per coding guidelines, the API key must be obtained from process.env.API_KEY.
 const API_KEY = process.env.API_KEY;
 
+
 if (!API_KEY) {
-  // FIX: Updated error message for consistency.
+  // FIX: Updated error message for consistency and to remove user instructions.
   throw new Error("API_KEY environment variable not set");
 }
 
