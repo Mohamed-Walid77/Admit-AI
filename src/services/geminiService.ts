@@ -6,8 +6,7 @@ import { Program, SimulationFeedback, ChatMessage } from '../types';
 // We will initialize the client just-in-time within each function to ensure the API key is available.
 const getAiClient = () => new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-export const runChat = async (programName: string, history: ChatMessage[], newPrompt: string): Promise<string> => {
-  const systemInstruction = `You are AdmitAI Global, a world-class AI mentor for high school students aiming for elite global programs. You have comprehensive knowledge of top programs like Pioneer Research, YYGS, RSI, LaunchX, TKS, Regeneron ISEF, The Gates Scholarship, and many more, across all fields from STEM to Humanities.
+const getChatSystemInstruction = (programName: string) => `You are AdmitAI Global, a world-class AI mentor for high school students aiming for elite global programs. You have comprehensive knowledge of top programs like Pioneer Research, YYGS, RSI, LaunchX, TKS, Regeneron ISEF, The Gates Scholarship, and many more, across all fields from STEM to Humanities.
 When a student mentions a program, your task is to act as an expert on it. You are currently assisting with the ${programName} application.
 Your guidance must be:
 1.  **Informative & Strategic**: Briefly explain the program's focus, prestige, and key deadlines. Provide insider tips on what makes an application stand out for *this specific program*.
@@ -15,26 +14,37 @@ Your guidance must be:
 3.  **A Creative Partner**: Actively help brainstorm and draft compelling essays, structure a resume, prepare for interviews, and refine project ideas. Go beyond generic advice.
 4.  **Motivational**: Share insights or (simulated) quotes from past participants to inspire the student. Maintain an encouraging, positive, and highly knowledgeable tone.
 Your goal is to be the ultimate application co-pilot, turning a stressful process into an empowering journey.`;
-  
-  const geminiHistory = history.map(msg => ({
-    role: msg.role,
-    parts: [{ text: msg.text }]
-  }));
 
+
+/**
+ * Creates a new, stateful chat session with the Gemini API.
+ * This session will remember the context of the conversation.
+ * @param programName The name of the program the user is applying for.
+ * @returns A Chat instance.
+ */
+export const createChatSession = (programName: string): Chat => {
+  const ai = getAiClient();
+  const chat = ai.chats.create({
+    model: 'gemini-2.5-flash',
+    config: {
+      systemInstruction: getChatSystemInstruction(programName),
+    },
+  });
+  return chat;
+};
+
+/**
+ * Sends a message to an existing chat session and gets the model's response.
+ * @param chat The stateful Chat object.
+ * @param prompt The user's message.
+ * @returns The model's text response.
+ */
+export const continueChat = async (chat: Chat, prompt: string): Promise<string> => {
   try {
-     const ai = getAiClient();
-     const chat = ai.chats.create({
-      model: 'gemini-2.5-flash',
-      history: geminiHistory,
-      config: {
-        systemInstruction: systemInstruction,
-      },
-    });
-
-    const response = await chat.sendMessage({ message: newPrompt });
+    const response = await chat.sendMessage({ message: prompt });
     return response.text;
   } catch (error) {
-    console.error("Error running chat:", error);
+    console.error("Error continuing chat:", error);
     return "I'm sorry, I encountered an error. Could you please try again?";
   }
 };
