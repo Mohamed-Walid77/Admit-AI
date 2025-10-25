@@ -2,11 +2,9 @@
 import { GoogleGenAI, Chat, Modality, Type } from "@google/genai";
 import { Program, SimulationFeedback, ChatMessage } from '../types';
 
-// Fix: Corrected API key retrieval to use process.env.API_KEY directly, as per coding guidelines.
-// The execution environment is assumed to have this variable pre-configured and accessible.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 export const runChat = async (programName: string, history: ChatMessage[], newPrompt: string): Promise<string> => {
+  // The API key is provided by the execution environment. Initialize the client on-demand.
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const systemInstruction = `You are AdmitAI Global, a world-class AI mentor for high school students aiming for elite global programs. You have comprehensive knowledge of top programs like Pioneer Research, YYGS, RSI, LaunchX, TKS, Regeneron ISEF, The Gates Scholarship, and many more, across all fields from STEM to Humanities.
 When a student mentions a program, your task is to act as an expert on it. You are currently assisting with the ${programName} application.
 Your guidance must be:
@@ -39,6 +37,8 @@ Your goal is to be the ultimate application co-pilot, turning a stressful proces
 };
 
 export const generateSpeech = async (text: string): Promise<string | null> => {
+    // The API key is provided by the execution environment. Initialize the client on-demand.
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     try {
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash-preview-tts",
@@ -61,6 +61,8 @@ export const generateSpeech = async (text: string): Promise<string | null> => {
 };
 
 export const getSimulationFeedback = async (program: Program, applicationData: Record<string, string>): Promise<SimulationFeedback> => {
+  // The API key is provided by the execution environment. Initialize the client on-demand.
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const systemInstruction = `You are a highly experienced admissions officer for the ${program.title}. Your task is to provide a critical, constructive, and encouraging review of a student's application draft.
   Analyze the provided application sections for clarity, grammar, tone, and alignment with the program's values (e.g., leadership, research aptitude, innovation).
   You must provide an overall score out of 10, overall feedback, and then detailed feedback for each individual section.
