@@ -56,7 +56,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ initialProgram }) => {
     
     if(isSpeaking) cancel();
 
-    const modelResponseText = await runChat(selectedProgram.title, historyForAPI, currentInput);
+    const modelResponseText = await runChat(selectedProgram, historyForAPI, currentInput);
     const newModelMessage: ChatMessage = { role: 'model', text: modelResponseText };
     
     setMessages(prev => [...prev, newModelMessage]);

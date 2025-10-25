@@ -1,14 +1,31 @@
 import { GoogleGenAI, Chat, Modality, Type } from "@google/genai";
 import { Program, SimulationFeedback, ChatMessage } from '../types';
 
-export const runChat = async (programName: string, history: ChatMessage[], newPrompt: string): Promise<string> => {
+export const runChat = async (program: Program, history: ChatMessage[], newPrompt: string): Promise<string> => {
   // The API key is provided by the execution environment. Initialize the client on-demand.
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+  // Pre-load context with specific program details.
+  const programContext = `
+---
+Program Information:
+Title: ${program.title}
+Organization: ${program.organization}
+Description: ${program.description}
+Key Deadlines: ${program.deadline}
+Eligibility: ${program.eligibility.join(', ')}
+Application Steps: ${program.applicationSteps.join(', ')}
+---
+`;
+
   const systemInstruction = `You are AdmitAI Global, a world-class AI mentor for high school students aiming for elite global programs. You have comprehensive knowledge of top programs like Pioneer Research, YYGS, RSI, LaunchX, TKS, Regeneron ISEF, The Gates Scholarship, and many more, across all fields from STEM to Humanities.
-When a student mentions a program, your task is to act as an expert on it. You are currently assisting with the ${programName} application.
+You are currently assisting with an application for the program detailed below. Use this information as your primary source of truth.
+
+${programContext}
+
 Your guidance must be:
-1.  **Informative & Strategic**: Briefly explain the program's focus, prestige, and key deadlines. Provide insider tips on what makes an application stand out for *this specific program*.
-2.  **Structured & Actionable**: Break down the entire application into a clear, step-by-step checklist. Proactively guide the student through each step.
+1.  **Informative & Strategic**: Leverage the provided program info. Provide insider tips on what makes an application stand out for *this specific program*.
+2.  **Structured & Actionable**: Break down the application into a clear, step-by-step checklist based on the provided application steps. Proactively guide the student through each step.
 3.  **A Creative Partner**: Actively help brainstorm and draft compelling essays, structure a resume, prepare for interviews, and refine project ideas. Go beyond generic advice.
 4.  **Motivational**: Share insights or (simulated) quotes from past participants to inspire the student. Maintain an encouraging, positive, and highly knowledgeable tone.
 Your goal is to be the ultimate application co-pilot, turning a stressful process into an empowering journey.`;
